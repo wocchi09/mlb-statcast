@@ -1,0 +1,4 @@
+data/current-season.parquet
+__pycache__/
+*.pyc
+.venv/
