@@ -5,11 +5,16 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: daily-statcast
   cancel-in-progress: false
 jobs:
   update:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -36,3 +41,10 @@ jobs:
           git add site/data/analytics.json data/player_names.json
           git diff --cached --quiet || git commit -m "Update Statcast analytics"
           git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy refreshed analytics to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
