@@ -97,10 +97,10 @@ def build(source: str, output: Path, name_cache: Path, merge_existing: bool = Fa
         FROM {scan} WHERE pitch_type IS NOT NULL GROUP BY game_year,pitch_type ORDER BY game_year,pitches DESC
     """)
     daily = rows(con, f"""
-        SELECT game_date date,count(*) pitches,count(DISTINCT game_pk) games,
+        SELECT game_date::DATE date,count(*) pitches,count(DISTINCT game_pk) games,
           round(avg(release_speed),2) velo,round(avg(launch_speed),2) ev,
           round(100*avg(CASE WHEN launch_speed>=95 THEN 1 ELSE 0 END),2) hard_hit_pct
-        FROM {scan} WHERE game_date >= current_date-INTERVAL 400 DAY GROUP BY game_date ORDER BY game_date
+        FROM {scan} WHERE game_date::DATE >= current_date-INTERVAL 400 DAY GROUP BY game_date::DATE ORDER BY game_date::DATE
     """)
     quality = rows(con, f"""
         SELECT game_year season,count(*) row_count,
