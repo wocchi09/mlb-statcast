@@ -28,6 +28,8 @@ jobs:
         run: python scripts/fetch_current.py
       - name: Rebuild current-season analytics
         run: python scripts/build_analytics.py --source 'data/current-season.parquet' --output site/data/analytics.json --name-cache data/player_names.json --merge-existing
+      - name: Fetch scores and schedule
+        run: python scripts/fetch_schedule.py
       - name: Archive current-season raw data in GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -38,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add site/data/analytics.json data/player_names.json
+          git add site/data/analytics.json site/data/schedule.json data/player_names.json
           git diff --cached --quiet || git commit -m "Update Statcast analytics"
           git push
       - uses: actions/configure-pages@v5
