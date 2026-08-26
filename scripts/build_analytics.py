@@ -49,8 +49,8 @@ def build(source: str, output: Path, name_cache: Path, merge_existing: bool = Fa
           count(DISTINCT pitcher) pitchers, count(DISTINCT batter) batters,
           round(avg(release_speed),2) avg_velo, round(avg(release_spin_rate),0) avg_spin,
           round(avg(launch_speed),2) avg_ev, round(avg(launch_angle),2) avg_la,
-          round(100*avg(CASE WHEN launch_speed>=95 THEN 1 ELSE 0 END),2) hard_hit_pct,
-          round(100*avg(CASE WHEN launch_speed_angle=6 THEN 1 ELSE 0 END),2) barrel_pct,
+          round(100*avg(CASE WHEN launch_speed IS NOT NULL THEN (launch_speed>=95)::INT END),2) hard_hit_pct,
+          round(100*avg(CASE WHEN launch_speed_angle IS NOT NULL THEN (launch_speed_angle=6)::INT END),2) barrel_pct,
           round(100*sum(description IN ({WHIFFS}))/nullif(sum(description IN ({SWINGS})),0),2) whiff_pct,
           round(100*avg((description IN ({CSW}))::INT),2) csw_pct
         FROM {scan} GROUP BY game_year ORDER BY game_year
@@ -64,8 +64,8 @@ def build(source: str, output: Path, name_cache: Path, merge_existing: bool = Fa
           sum(events='home_run') hr,sum(events IN ('walk','intent_walk')) bb,
           sum(events IN ('strikeout','strikeout_double_play')) so,sum(events='hit_by_pitch') hbp,
           sum(events='sac_fly') sf,avg(launch_speed) ev,avg(launch_angle) la,
-          avg(CASE WHEN launch_speed>=95 THEN 1 ELSE 0 END) hardhit,
-          avg(CASE WHEN launch_speed_angle=6 THEN 1 ELSE 0 END) barrel,
+          avg(CASE WHEN launch_speed IS NOT NULL THEN (launch_speed>=95)::INT END) hardhit,
+          avg(CASE WHEN launch_speed_angle IS NOT NULL THEN (launch_speed_angle=6)::INT END) barrel,
           avg(estimated_woba_using_speedangle) xwoba FROM a GROUP BY season,batter)
         SELECT *,round(h/nullif(ab,0),3) avg,
           round((h+bb+hbp)/nullif(ab+bb+hbp+sf,0),3) obp,
