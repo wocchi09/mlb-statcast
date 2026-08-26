@@ -26,6 +26,7 @@ def normalize_game(game: dict) -> dict:
         return {
             "id": team.get("id"),
             "name": team.get("name"),
+            "abbreviation": team.get("abbreviation"),
             "score": entry.get("score"),
             "winner": entry.get("isWinner"),
             "probable_pitcher": person_name(entry.get("probablePitcher")),
