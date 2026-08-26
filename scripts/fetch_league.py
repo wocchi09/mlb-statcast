@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -26,17 +26,15 @@ def number(value):
         return value
 
 
-def player_rows(group: str, season: int) -> list[dict]:
-    payload = get(
-        "stats",
-        stats="season",
-        group=group,
-        playerPool="ALL",
-        season=season,
-        sportIds=1,
-        limit=5000,
-        hydrate="team",
-    )
+def player_rows(group: str, season: int, start: str | None = None, end: str | None = None) -> list[dict]:
+    params = {
+        "stats": "byDateRange" if start and end else "season", "group": group,
+        "playerPool": "ALL", "season": season, "sportIds": 1,
+        "limit": 5000, "hydrate": "team",
+    }
+    if start and end:
+        params.update(startDate=start, endDate=end)
+    payload = get("stats", **params)
     rows = []
     for split in (payload.get("stats") or [{}])[0].get("splits", []):
         stat, player, team = split.get("stat", {}), split.get("player", {}), split.get("team", {})
@@ -80,17 +78,24 @@ def main() -> None:
     parser.add_argument("--season", type=int, default=date.today().year)
     parser.add_argument("--output", default="site/data/league.json")
     args = parser.parse_args()
+    week_end = date.today()
+    week_start = week_end - timedelta(days=6)
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "season": args.season,
         "standings": standings(args.season),
         "hitters": player_rows("hitting", args.season),
         "pitchers": player_rows("pitching", args.season),
+        "weekly": {
+            "start_date": week_start.isoformat(), "end_date": week_end.isoformat(),
+            "hitters": player_rows("hitting", args.season, week_start.isoformat(), week_end.isoformat()),
+            "pitchers": player_rows("pitching", args.season, week_start.isoformat(), week_end.isoformat()),
+        },
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    print(f"Wrote {len(payload['standings'])} teams, {len(payload['hitters'])} hitters and {len(payload['pitchers'])} pitchers")
+    print(f"Wrote {len(payload['standings'])} teams, {len(payload['hitters'])} hitters, {len(payload['pitchers'])} pitchers and weekly splits")
 
 
 if __name__ == "__main__":
