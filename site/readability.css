@@ -48,6 +48,8 @@
   .data-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .saber-leaders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .controls { gap: 8px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .grid2 > * { min-width: 0; }
 }
 
 @media (max-width: 720px) {
