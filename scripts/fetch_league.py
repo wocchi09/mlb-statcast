@@ -157,7 +157,8 @@ def standings(season: int) -> list[dict]:
             team = record.get("team", {})
             rows.append({
                 "team_id": team.get("id"), "team": team.get("abbreviation"), "name": team.get("name"),
-                "league": (team.get("league") or {}).get("abbreviation"),
+                "league": ((team.get("league") or {}).get("abbreviation") or
+                           ("AL" if "American League" in (team.get("division") or {}).get("name", "") else "NL")),
                 "division": (team.get("division") or {}).get("name"),
                 "rank": number(record.get("divisionRank")), "games": record.get("gamesPlayed"),
                 "wins": record.get("wins"), "losses": record.get("losses"),
