@@ -1,3 +1,20 @@
+.mobile-nav-label { display: none; }
+
+.tabs { align-items: stretch; gap: 10px; }
+.tab-group { display: flex; align-items: center; gap: 5px; padding: 5px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
+.tab-group > span { padding: 0 6px; color: var(--muted); font-size: .68rem; font-weight: 900; writing-mode: vertical-rl; letter-spacing: .08em; }
+.tab-group .tab { border: 0; padding: 8px 11px; }
+
+.column-picker { position: relative; }
+.column-picker summary { padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); cursor: pointer; font-weight: 800; }
+.column-picker > div { position: absolute; z-index: 20; top: calc(100% + 5px); left: 0; display: grid; grid-template-columns: repeat(2, minmax(115px, 1fr)); gap: 5px; min-width: 300px; max-height: 310px; overflow: auto; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
+.column-picker label { display: flex; align-items: center; gap: 5px; padding: 5px; white-space: nowrap; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 7px; padding: 15px 0 2px; }
+.pagination button { padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); font: inherit; font-weight: 800; cursor: pointer; }
+.pagination button:disabled { opacity: .4; cursor: default; }
+.pagination span { min-width: 90px; text-align: center; color: var(--muted); font-size: .82rem; }
+.official-table th:first-child,.official-table td:first-child { z-index: 2; }
+
 .league-switch {
   display: flex;
   align-items: center;
@@ -53,6 +70,15 @@
 }
 
 @media (max-width: 720px) {
+  .grid2 > *,.panel,.tablewrap { min-width: 0; max-width: 100%; }
+  .tabs { display: none; }
+  .mobile-nav-label { position: sticky; top: 0; z-index: 8; display: flex; align-items: center; gap: 8px; margin: 9px -10px 14px; padding: 8px 10px; background: var(--bg); color: var(--muted); font-size: .75rem; font-weight: 800; }
+  .mobile-nav-label select { flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); font: inherit; font-weight: 800; }
+  .column-picker { width: 100%; }
+  .column-picker > div { position: static; grid-template-columns: repeat(2, 1fr); min-width: 0; margin-top: 6px; }
+  .pagination { gap: 4px; }
+  .pagination button { padding: 7px 8px; font-size: .75rem; }
+  .pagination button:first-child,.pagination button:last-child { display: none; }
   .league-switch { width: 100%; overflow-x: auto; }
   .league-switch button { flex: 1 0 auto; padding: 8px 9px; }
   .controls { position: static !important; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; padding: 10px; }

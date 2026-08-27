@@ -125,6 +125,10 @@ def build(source: str, output: Path, name_cache: Path, merge_existing: bool = Fa
         payload["daily"] = [item for item in previous.get("daily", []) if item.get("date") not in new_dates] + daily
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), "utf-8")
+    summary = {"generated_at": payload["generated_at"], "seasons": payload["seasons"]}
+    output.with_name("analytics-summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, separators=(",", ":")), "utf-8"
+    )
 
 
 if __name__ == "__main__":
