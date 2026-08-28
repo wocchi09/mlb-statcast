@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://wocchi09.github.io/mlb-statcast/sitemap.xml
