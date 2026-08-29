@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -169,6 +171,60 @@ def standings(season: int) -> list[dict]:
     return rows
 
 
+def add_playoff_odds(rows: list[dict], simulations: int = 5000) -> None:
+    """Independent estimate using current record and Pythagorean run strength."""
+    rng = random.Random(2026)
+    qualified = {row["team_id"]: 0 for row in rows}
+    strengths = {}
+    for row in rows:
+        scored, allowed = row.get("runs") or 1, row.get("runs_allowed") or 1
+        pythag = scored ** 1.83 / (scored ** 1.83 + allowed ** 1.83)
+        current = (row.get("wins") or 0) / max(row.get("games") or 1, 1)
+        strengths[row["team_id"]] = max(.25, min(.75, .6 * pythag + .4 * current))
+        row["projected_wins"] = round((row.get("wins") or 0) + max(0, 162 - (row.get("games") or 0)) * strengths[row["team_id"]], 1)
+    for _ in range(simulations):
+        totals = {}
+        for row in rows:
+            remaining = max(0, 162 - (row.get("games") or 0))
+            totals[row["team_id"]] = (row.get("wins") or 0) + sum(rng.random() < strengths[row["team_id"]] for _ in range(remaining)) + rng.random() * .01
+        for league in ("AL", "NL"):
+            league_rows = [row for row in rows if row.get("league") == league]
+            division_winners = []
+            for division in {row.get("division") for row in league_rows}:
+                division_winners.append(max((row for row in league_rows if row.get("division") == division), key=lambda row: totals[row["team_id"]]))
+            winner_ids = {row["team_id"] for row in division_winners}
+            wildcards = sorted((row for row in league_rows if row["team_id"] not in winner_ids), key=lambda row: totals[row["team_id"]], reverse=True)[:3]
+            for row in division_winners + wildcards:
+                qualified[row["team_id"]] += 1
+    for row in rows:
+        row["playoff_pct"] = round(100 * qualified[row["team_id"]] / simulations, 1)
+
+
+def injured_roster(team: dict) -> list[dict]:
+    try:
+        payload = get(f"teams/{team['team_id']}/roster", rosterType="40Man", hydrate="person")
+    except requests.RequestException:
+        return []
+    result = []
+    for entry in payload.get("roster", []):
+        status = entry.get("status") or {}
+        if status.get("code") == "A" or "injur" not in (status.get("description") or "").lower():
+            continue
+        person = entry.get("person") or {}
+        result.append({
+            "id": person.get("id"), "name": person.get("fullName"),
+            "team_id": team["team_id"], "team": team.get("team"),
+            "position": (entry.get("position") or {}).get("abbreviation"),
+            "status": status.get("description"),
+        })
+    return result
+
+
+def injuries(teams: list[dict]) -> list[dict]:
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return [player for batch in pool.map(injured_roster, teams) for player in batch]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--season", type=int, default=date.today().year)
@@ -179,13 +235,16 @@ def main() -> None:
     hitters = player_rows("hitting", args.season)
     pitchers = player_rows("pitching", args.season)
     sabermetrics = add_sabermetrics(hitters, pitchers, args.season)
+    team_rows = standings(args.season)
+    add_playoff_odds(team_rows)
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "season": args.season,
-        "standings": standings(args.season),
+        "standings": team_rows,
         "hitters": hitters,
         "pitchers": pitchers,
         "sabermetrics": sabermetrics,
+        "injuries": injuries(team_rows),
         "weekly": {
             "start_date": week_start.isoformat(), "end_date": week_end.isoformat(),
             "hitters": player_rows("hitting", args.season, week_start.isoformat(), week_end.isoformat()),
