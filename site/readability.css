@@ -55,6 +55,10 @@
 .player-hero + h2 + .stat-blocks .stat-block { position: relative; padding-bottom: 30px; }
 .stat-rank { position: absolute; right: 11px; bottom: 8px; padding: 2px 7px; border-radius: 999px; background: color-mix(in srgb,var(--accent) 11%,transparent); color: var(--accent); font-size: .72rem; font-weight: 950; letter-spacing: .03em; }
 .stat-rank.outside { background: color-mix(in srgb,var(--muted) 10%,transparent); color: var(--muted); }
+.qualification-badge { display: inline-flex; width: fit-content; margin-top: 8px; padding: 4px 9px; border-radius: 999px; font-size: .72rem; font-weight: 950; }
+.qualification-badge.qualified,.qualifier-chip.qualified { background: #dff7eb; color: #08704b; }
+.qualification-badge.outside,.qualifier-chip.outside { background: #eef1f4; color: #68727d; }
+.qualifier-chip { position: absolute; top: 8px; right: 8px; padding: 2px 6px; border-radius: 999px; font-size: .62rem; font-weight: 950; }
 .split-table { min-width: 520px; }
 .compare-layout { display: grid; grid-template-columns: minmax(230px,.55fr) minmax(0,1.45fr); gap: 18px; align-items: start; }
 .compare-layout label { display: grid; gap: 8px; font-weight: 800; }
