@@ -52,6 +52,9 @@
 .injury-list > div { display: grid; grid-template-columns: minmax(180px,1fr) 70px minmax(180px,1fr); gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .injury-list strong { color: var(--accent); }
 .player-splits { margin-top: 28px; }
+.player-hero + h2 + .stat-blocks .stat-block { position: relative; padding-bottom: 30px; }
+.stat-rank { position: absolute; right: 11px; bottom: 8px; padding: 2px 7px; border-radius: 999px; background: color-mix(in srgb,var(--accent) 11%,transparent); color: var(--accent); font-size: .72rem; font-weight: 950; letter-spacing: .03em; }
+.stat-rank.outside { background: color-mix(in srgb,var(--muted) 10%,transparent); color: var(--muted); }
 .split-table { min-width: 520px; }
 .compare-layout { display: grid; grid-template-columns: minmax(230px,.55fr) minmax(0,1.45fr); gap: 18px; align-items: start; }
 .compare-layout label { display: grid; gap: 8px; font-weight: 800; }
