@@ -29,10 +29,14 @@ async function main() {
   });
   vm.runInContext(code, context);
   context.feed = feed;
+  const boxResponse = await fetch(`https://statsapi.mlb.com/api/v1/game/${gamePk}/boxscore`);
+  if (!boxResponse.ok) throw new Error(`MLB boxscore HTTP ${boxResponse.status}`);
+  context.box = await boxResponse.json();
   const result = vm.runInContext(`(() => {
     LEAGUE = { pitchers: [] };
     const data = gameAnalysisData(feed);
     const html = renderGameAnalysis(feed, {});
+    const advanced = renderAdvancedGameAnalysis(feed, box);
     return {
       plays: data.plays.length,
       pitches: data.pitches.length,
@@ -41,10 +45,15 @@ async function main() {
       hasArsenal: html.includes('投手別・球種別の配球分析'),
       hasSprayMap: html.includes('打球方向マップ'),
       hasFatigue: html.includes('球速・疲労サイン'),
+      hasBatterPlan: advanced.includes('打者攻略・球種別弱点'),
+      hasCountMix: advanced.includes('カウント別配球'),
+      hasStuff: advanced.includes('Stuff・リリース安定性'),
+      hasEnvironment: advanced.includes('球場・環境'),
+      hasReport: advanced.includes('自動試合レポート'),
     };
   })()`, context);
   console.log(JSON.stringify(result));
-  if (!result.plays || !result.pitches || !result.flow || !result.hasArsenal || !result.hasSprayMap || !result.hasFatigue) {
+  if (!result.plays || !result.pitches || !result.flow || !result.hasArsenal || !result.hasSprayMap || !result.hasFatigue || !result.hasBatterPlan || !result.hasCountMix || !result.hasStuff || !result.hasEnvironment || !result.hasReport) {
     process.exitCode = 1;
   }
 }
