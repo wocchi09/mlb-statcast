@@ -9,6 +9,7 @@ from pathlib import Path
 import requests
 
 API = "https://statsapi.mlb.com/api/v1/schedule"
+FEED_API = "https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live"
 
 
 def person_name(value: dict | None) -> str | None:
@@ -59,6 +60,43 @@ def normalize_game(game: dict) -> dict:
     }
 
 
+def daily_highlights(raw_dates: list[dict]) -> dict | None:
+    completed = []
+    for item in raw_dates:
+        finals = [game for game in item.get("games", []) if game.get("status", {}).get("abstractGameState") == "Final"]
+        if finals:
+            completed.append((item["date"], finals))
+    if not completed:
+        return None
+    day, games = completed[-1]
+    pitches, hits, whiffs = [], [], {}
+    session = requests.Session()
+    for game in games:
+        response = session.get(FEED_API.format(game_pk=game["gamePk"]), timeout=45)
+        if not response.ok:
+            continue
+        for play in response.json().get("liveData", {}).get("plays", {}).get("allPlays", []):
+            matchup = play.get("matchup", {})
+            pitcher = matchup.get("pitcher", {}).get("fullName", "—")
+            batter = matchup.get("batter", {}).get("fullName", "—")
+            for event in play.get("playEvents", []):
+                pitch = event.get("pitchData") or {}
+                if event.get("isPitch") and pitch.get("startSpeed") is not None:
+                    pitches.append({"value": pitch["startSpeed"], "name": pitcher, "game_pk": game["gamePk"]})
+                    if "Swinging Strike" in (event.get("details", {}).get("description") or ""):
+                        whiffs[pitcher] = whiffs.get(pitcher, 0) + 1
+                hit = event.get("hitData") or {}
+                if hit.get("launchSpeed") is not None:
+                    hits.append({"ev": hit["launchSpeed"], "dist": hit.get("totalDistance") or 0, "name": batter, "game_pk": game["gamePk"]})
+    return {
+        "date": day,
+        "fastest_pitch": max(pitches, key=lambda row: row["value"], default=None),
+        "hardest_hit": max(hits, key=lambda row: row["ev"], default=None),
+        "longest_hit": max(hits, key=lambda row: row["dist"], default=None),
+        "most_whiffs": ({"name": max(whiffs, key=whiffs.get), "value": max(whiffs.values())} if whiffs else None),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", default="site/data/schedule.json")
@@ -90,6 +128,7 @@ def main() -> None:
         "start_date": start,
         "end_date": end,
         "dates": dates,
+        "daily_highlights": daily_highlights(raw.get("dates", [])),
     }
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
