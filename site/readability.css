@@ -251,6 +251,16 @@
 .environment-list { margin: 8px 0; }.environment-list > div { display: grid; grid-template-columns: 90px 1fr; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--line); }.environment-list dt { color: var(--muted); }.environment-list dd { margin: 0; font-weight: 800; }
 .glossary { margin-top: 12px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }.glossary summary { cursor: pointer; color: var(--navy); font-weight: 900; }.glossary > div { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }.glossary p { margin: 7px 0; }
 .series-snapshot { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 16px; }.series-snapshot h2 { margin: 3px 0; }.series-snapshot p { margin: 0; color: var(--muted); }.series-games { display: flex; gap: 7px; }.series-games button { display: grid; min-width: 62px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); cursor: pointer; }.series-games b { color: var(--accent); }.series-games small { color: var(--muted); }
+.game-jump-nav { position: sticky; z-index: 7; top: 8px; display: flex; align-items: center; gap: 7px; margin: 14px 0; padding: 9px; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb,var(--panel) 94%,transparent); box-shadow: 0 10px 28px #102a4320; backdrop-filter: blur(12px); scrollbar-width: none; }
+.game-jump-nav::-webkit-scrollbar { display: none; }.jump-intro { display: grid; flex: 0 0 auto; min-width: 150px; padding: 0 9px; border-right: 1px solid var(--line); }.jump-intro span { color: var(--accent); font-size: .68rem; font-weight: 900; }.jump-intro b { font-size: .78rem; }
+.game-jump-nav a { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; padding: 9px 11px; border-radius: 10px; color: var(--ink); font-weight: 800; text-decoration: none; }.game-jump-nav a:hover { background: var(--bg); color: var(--accent); }.game-jump-nav i { color: var(--muted); font-size: .65rem; font-style: normal; }
+.density-switch { display: flex; flex: 0 0 auto; margin-left: auto; padding: 3px; border-radius: 10px; background: var(--bg); }.density-switch button { border: 0; border-radius: 8px; padding: 7px 9px; background: transparent; color: var(--muted); font: inherit; font-size: .72rem; font-weight: 900; cursor: pointer; }.density-switch button.on { background: var(--navy); color: #fff; }
+.game-readable { padding: clamp(12px,2vw,24px); }.game-readable > section { scroll-margin-top: 92px; }.game-readable .game-analysis,.game-readable .advanced-suite,.game-readable .plate-section,.game-readable .box-score-section { max-width: 1280px; margin-right: auto; margin-left: auto; }.game-readable .section-head h2 { font-size: clamp(1.25rem,2.4vw,1.75rem); }.game-readable .panel { box-shadow: 0 8px 24px #102a4310; }
+.advanced-suite,.plate-section,.box-score-section { padding: 24px 0 4px; border-top: 1px solid var(--line); }.box-score-section { margin-top: 28px; }
+.section-reveal { display: none; width: 100%; margin: 10px 0 14px; padding: 12px; border: 1px dashed #176c8380; border-radius: 12px; background: #176c830b; color: var(--navy); font: inherit; font-weight: 900; cursor: pointer; }
+.simple-mode .section-reveal { display: block; }.simple-mode .advanced-suite .advanced-grid,.simple-mode .advanced-suite > .panel,.simple-mode .advanced-suite .glossary { display: none; }.simple-mode .plate-section > :not(.section-head):not(.section-reveal),.simple-mode .box-score-section .box-teams { display: none; }
+.simple-mode .advanced-suite { padding-bottom: 16px; }.simple-mode .plate-section,.simple-mode .box-score-section { min-height: 150px; padding-bottom: 16px; }
+.game-readable .tablewrap { border: 1px solid var(--line); border-radius: 12px; }.game-readable .official-table th { background: color-mix(in srgb,var(--panel) 75%,#8797a8 25%); }.game-readable .official-table tbody tr:nth-child(even) { background: color-mix(in srgb,var(--panel) 94%,#789 6%); }
 
 .tabs { align-items: stretch; gap: 10px; }
 .tab-group { display: flex; align-items: center; gap: 5px; padding: 5px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); }
@@ -322,6 +332,14 @@
   .standings-card-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
+@media (min-width: 721px) and (max-width: 1100px) {
+  .game-jump-nav { top: 8px; }
+  .jump-intro { display: none; }
+  .analysis-grid,.advanced-grid { grid-template-columns: 1fr; }
+  .game-readable .game-chart { min-height: 350px; }
+  .pitcher-score-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
 @media (max-width: 720px) {
   .grid2 > *,.panel,.tablewrap { min-width: 0; max-width: 100%; }
   .tabs { display: none; }
@@ -389,6 +407,9 @@
   .advanced-grid { grid-template-columns: 1fr; }
   .team-context,.glossary > div { grid-template-columns: 1fr; }
   .series-snapshot { align-items: flex-start; flex-direction: column; }.series-games { width: 100%; overflow-x: auto; }
+  .game-jump-nav { top: 6px; margin: 9px -4px 13px; padding: 7px; }.jump-intro { display: none; }.game-jump-nav a { padding: 8px 9px; }.density-switch { margin-left: 0; }.density-switch button { padding: 7px 8px; }
+  .game-readable { padding: 10px 8px; }.game-readable .analysis-hero { margin-right: -8px; margin-left: -8px; border-radius: 16px; }.game-readable .analysis-kpis > div,.game-readable .quality-kpis > div { min-height: 104px; }
+  .advanced-suite,.plate-section,.box-score-section { padding-top: 18px; }.game-readable .section-head { align-items: flex-start; }.game-readable .section-head > .note { max-width: 45%; text-align: right; }
   .tabs { position: sticky; top: 0; z-index: 8; margin: 9px -10px 14px; padding: 7px 10px; background: var(--bg); scroll-padding: 10px; }
   .tab { padding: 8px 12px; border-radius: 999px; font-size: .82rem; }
 }
