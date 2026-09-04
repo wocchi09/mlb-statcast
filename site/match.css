@@ -1,0 +1,21 @@
+.match-score,.starting-lineups{margin-bottom:28px;scroll-margin-top:90px}
+.match-score header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.match-score header span{color:var(--muted);font-size:14px}
+.match-score th,.match-score td{padding:12px;min-width:38px;text-align:center;font-size:16px}
+.match-score tr>:first-child{text-align:left;min-width:180px;background:var(--panel);position:sticky;left:0}
+.match-score .score-total{font-size:24px;font-weight:900;color:var(--accent)}
+.lineup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.lineup-team{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);min-width:0}
+.lineup-team h3{margin:0 0 12px;color:var(--navy);font-size:18px}
+.lineup-list{margin:0;padding:0;list-style:none}
+.lineup-list li{display:grid;grid-template-columns:32px minmax(0,1fr) 44px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:16px}
+.lineup-order{font-weight:900;color:var(--muted)}
+.lineup-list li>span:last-child{text-align:center;color:var(--muted);font-size:14px}
+.lineup-starter{font-size:16px;margin:14px 0 0}.lineup-starter b{display:block;font-size:14px;color:var(--muted)}
+.extra-analysis{margin-top:28px;border:1px solid var(--line);border-radius:14px;padding:18px}
+.extra-analysis>summary{cursor:pointer;font-size:18px;font-weight:800;color:var(--navy);padding:6px}
+.extra-analysis[open]>.game-analysis{margin-top:28px}
+.pitch-map-column{min-width:0}.pitch-layout{grid-template-columns:minmax(230px,340px) minmax(0,1fr)}
+.game-readable .box-score-section{margin-top:0}.game-readable .plate-card summary{font-size:16px}
+@media(max-width:1000px){.pitch-layout{grid-template-columns:1fr}.pitch-list{overflow-x:auto}.lineup-list li{font-size:16px}}
+@media(max-width:700px){.lineup-grid{grid-template-columns:1fr}.lineup-team{padding:14px}.match-score th,.match-score td{padding:10px 8px}.match-score tr>:first-child{min-width:135px;font-size:14px}}

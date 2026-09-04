@@ -33,7 +33,17 @@ async function main() {
   if (!boxResponse.ok) throw new Error(`MLB boxscore HTTP ${boxResponse.status}`);
   context.box = await boxResponse.json();
   const result = vm.runInContext(`(() => {
-    LEAGUE = { pitchers: [] };
+    LEAGUE = { pitchers: [], standings: [] };
+    SCHEDULE = { dates: {} };
+    const match = renderMatchContent(feed, box);
+    const sections = ['matchScore','startingLineups','boxScore','plateByPlate','extraAnalysis'];
+    if (!sections.every((id, i) => match.includes('id="' + id + '"') && (!i || match.indexOf('id="' + id + '"') > match.indexOf('id="' + sections[i-1] + '"')))) throw Error('Match section order');
+    for (const side of ['away','home']) {
+      const starters = startingPlayers(box.teams[side]);
+      if (starters.length !== 9) throw Error('Expected nine original starters: ' + side);
+    }
+    const zeroOut = { players: { p: { stats: { pitching: { outs: 0, numberOfPitches: 6 } } } } };
+    if (boxRows(zeroOut,'pitching').length !== 1) throw Error('Zero-out pitcher excluded');
     const data = gameAnalysisData(feed);
     const html = renderGameAnalysis(feed, {});
     const advanced = renderAdvancedGameAnalysis(feed, box);
