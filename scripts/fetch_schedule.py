@@ -43,6 +43,8 @@ def normalize_game(game: dict) -> dict:
 
     return {
         "game_pk": game.get("gamePk"),
+        "game_type": game.get("gameType"),
+        "official_date": game.get("officialDate"),
         "game_date": game.get("gameDate"),
         "status": game.get("status", {}).get("abstractGameState"),
         "detailed_state": game.get("status", {}).get("detailedState"),

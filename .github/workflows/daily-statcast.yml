@@ -32,6 +32,12 @@ jobs:
         run: python scripts/fetch_schedule.py
       - name: Fetch standings and official player stats
         run: python scripts/fetch_league.py
+      - name: Build analyst workbench data
+        run: python scripts/build_workbench.py
+      - name: Check analyst calculations
+        run: |
+          node scripts/test_workbench.js
+          python scripts/test_workbench_export.py
       - name: Archive current-season raw data in GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,6 +49,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add site/data/analytics.json site/data/analytics-summary.json site/data/schedule.json site/data/league.json data/player_names.json
+          git add site/data/workbench
           git diff --cached --quiet || git commit -m "Update Statcast analytics"
           git push
       - uses: actions/configure-pages@v5

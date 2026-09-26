@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict');
+const C=require('../site/workbench-core.js');
+const base={game_date:'2026-06-01',game_pk:1,pitcher:10,batter:20,pitch_type:'FF',stand:'L',p_throws:'R',balls:0,strikes:0,home_team:'NYY',away_team:'BOS',inning_topbot:'Top'};
+const r=(extra={})=>({...base,...extra});
+let rows=[r({events:'single',description:'hit_into_play',launch_speed:100,estimated_ba_using_speedangle:.7,estimated_slg_using_speedangle:.9,release_speed:90,woba_value:.9,woba_denom:1,estimated_woba_using_speedangle:.8}),r({events:'strikeout',description:'swinging_strike',release_speed:null,woba_value:0,woba_denom:1}),r({events:'walk',description:'ball',release_speed:94,woba_value:.7,woba_denom:1}),r({events:'sac_fly',description:'hit_into_play',launch_speed:null,woba_value:0,woba_denom:1}),r({events:null,description:'foul',release_speed:92})];
+let s=C.summary(rows);assert.equal(s.pitches,5);assert.equal(s.pa,4);assert.equal(s.ab,2);assert.equal(s.avg,.5);assert.equal(s.slg,.5);assert.equal(s.velo,92);assert.equal(s.whiff,.25);assert.equal(s.quality.launch_speed.missing,.5);assert.equal(s.expectedBA.n,1);assert.equal(s.expectedBA.actual,1);assert.equal(s.expectedBA.expected,.7);assert.equal(s.woba,.4);
+assert.equal(C.summary([]).avg,null);assert.equal(C.summary([]).quality.launch_speed.missing,null);assert.equal(C.finite(null),false);
+assert(C.matches(base,{role:'batter',player:'20',team:'BOS',pitch:'FF',stand:'L',throws:'R',count:'0-0'}));assert(!C.matches(base,{role:'pitcher',team:'BOS'}));assert(!C.matches(base,{role:'batter',count:'0-1'}));
+const map=C.heatmap([r({plate_x:0,plate_z:2.5,sz_bot:1.5,sz_top:3.5,description:'swinging_strike'}),r({plate_x:null,plate_z:2.5,sz_bot:1.5,sz_top:3.5})],'whiff');assert.equal(map.located,1);assert.equal(map.bins[2][2].n,1);assert.equal(map.bins[2][2].d,1);
+const timeline=C.rolling([r({release_speed:90}),r({game_date:'2026-06-07',release_speed:94}),r({game_date:'2026-06-08',release_speed:96})],7);assert.equal(timeline[1].velo,92);assert.equal(timeline[2].velo,95);
+const changeRows=[...Array.from({length:30},()=>r({release_speed:90})),...Array.from({length:30},()=>r({game_date:'2026-06-08',release_speed:92}))];assert(C.changes(changeRows,7).some(a=>a.label==='球速'&&a.delta===2));assert.equal(C.changes(changeRows.slice(1),7).length,0);
+assert(C.csv([{name:'=SUM(A1)',value:'a,"b'}],['name','value']).includes("'SUM(A1)"));
+console.log('Workbench: denominators, missing values, filters, heatmap, rolling windows, alerts and CSV passed');

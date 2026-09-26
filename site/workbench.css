@@ -1,0 +1,34 @@
+.wb { max-width: 1250px; padding: 24px 18px 60px; }
+.wb-brand { color: white; font-weight: 900; text-decoration: none; font-size: 1.2rem; }
+.wb-intro { margin: 12px 0 24px; }
+.wb-intro h1 { font-size: clamp(1.6rem,4vw,2.6rem); margin: 8px 0; }
+.wb .panel { margin-bottom: 20px; min-width: 0; }
+.wb h2 { margin-top: 0; font-size: 1.2rem; }
+.wb-filters { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+.wb label { display: grid; gap: 5px; font-weight: 700; font-size: .85rem; }
+.wb input,.wb select { min-width: 0; width: 100%; padding: 10px; }
+.wb-player { grid-column: span 2; }
+.wb-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+.wb .primary { background: #12355b; color: white; }
+.wb .btn { cursor: pointer; }
+.wb .btn:disabled { opacity: .45; cursor: wait; }
+.wb-scroll { overflow: auto; max-width: 100%; }
+.wb-scroll::before { content: '↔ 表は左右にスクロールできます'; display: block; font-size: .72rem; color: var(--muted); padding: 4px 0; }
+.wb table { width: 100%; min-width: 600px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.wb th,.wb td { padding: 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+.wb th:first-child,.wb td:first-child { text-align: left; }
+.wb-kpis { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-bottom: 18px; }
+.wb-kpis article { background: #eaf0f5; padding: 14px; border-radius: 12px; }
+.wb-kpis strong { display: block; font-size: 1.6rem; color: #12355b; }
+.wb-notice { border-left: 4px solid #b66e00; background: #fff3da; padding: 12px; }
+.wb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.wb-heat { display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; max-width: 450px; margin: 16px auto; }
+.wb-cell { min-height: 66px; display: grid; place-content: center; text-align: center; border: 1px solid #d5dce4; border-radius: 5px; color: #132b43; }
+.wb-cell small { font-size: .68rem; }
+.wb-chart { width: 100%; height: auto; display: block; background: #f8fafc; }
+.wb-trend-label { display: flex; flex-wrap: wrap; gap: 12px; font-size: .8rem; }
+.wb-trend-label span:first-child { color: #075c9c; }.wb-trend-label span:last-child { color: #b33b2d; }
+.wb-method p,.wb-method a { max-width: 900px; }
+#message { min-height: 24px; }
+@media(max-width:750px) { .wb-filters,.wb-grid { grid-template-columns: 1fr 1fr; } .wb-grid > * { grid-column: span 2; } .wb-kpis { grid-template-columns: 1fr 1fr; } .wb { padding: 14px 10px 40px; } }
+@media(max-width:420px) { .wb-filters { grid-template-columns: 1fr; } .wb-player { grid-column: auto; } }

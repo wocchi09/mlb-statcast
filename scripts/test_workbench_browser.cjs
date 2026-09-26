@@ -1,0 +1,23 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const http=require('node:http');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const root=path.resolve('site');
+const types={'.js':'text/javascript','.html':'text/html','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'};
+const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(err,data)=>{if(err){res.writeHead(404).end();return;}res.setHeader('Content-Type',types[path.extname(file)]||'application/octet-stream');res.end(data);});});
+(async()=>{await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const browser=await chromium.launch({channel:'chrome',headless:true});
+try{const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto(`http://127.0.0.1:${server.address().port}/workbench.html`);
+await page.waitForFunction(()=>document.querySelector('#message').textContent.startsWith('分析完了'),{},{timeout:120000});
+assert.equal(await page.locator('#results h2').count(),6);
+assert(await page.locator('#health').innerText().then(t=>t.includes('照合対象')&&!t.includes('照合可能な')));
+for(const width of [390,1024,1440]){await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`overflow at ${width}`);await page.screenshot({path:path.join(process.env.TEMP||'.',`mlb-workbench-${width}.png`),fullPage:true});}
+await page.selectOption('[name=player]','669373');await page.selectOption('[name=pitch]','FF');await page.selectOption('[name=count]','0-0');await page.selectOption('[name=heat]','whiff');
+await page.click('[type=submit]');await page.waitForFunction(()=>document.querySelector('#message').textContent.startsWith('分析完了'),{},{timeout:120000});
+await page.click('#save');await page.selectOption('[name=pitch]','SL');await page.click('#load');assert.equal(await page.inputValue('[name=pitch]'),'FF');
+await page.click('[type=submit]');await page.waitForFunction(()=>document.querySelector('#message').textContent.startsWith('分析完了'),{},{timeout:120000});
+const download=page.waitForEvent('download');await page.click('#exportCsv');const d=await download;const csv=fs.readFileSync(await d.path(),'utf8');assert(csv.includes('game_date'));assert(csv.includes('FF'));
+assert.deepEqual(errors,[]);console.log('Browser: actual worker/shards, 3 widths, filters, saved conditions, CSV and schedule health passed');
+console.log(await page.locator('#health').innerText());
+}finally{await browser.close();server.close();}})().catch(e=>{console.error(e);server.close();process.exitCode=1;});
